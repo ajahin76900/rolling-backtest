@@ -3,6 +3,7 @@ import numpy as np
 
 from load_prices import load_prices
 from ma_signal import ma_signal
+from strategy_returns import strategy_returns
 
 ticker = "SPY"
 start = "2005-01-01"
@@ -20,6 +21,8 @@ if __name__ == "__main__":
     position = signal.shift(1).fillna(0)
     honest = (position * returns).dropna()
 
-    print("Cheating total return:", (1 + cheat).prod() - 1)
-    print("Honest total return:  ", (1 + honest).prod() - 1)
-    print("Buy & hold:           ", (1 + returns.dropna()).prod() - 1)
+    print("Honest total return (net of costs):  ", (1 + honest).prod() - 1)
+    print("Buy & hold total return:             ", (1 + returns.dropna()).prod() - 1)
+
+    num_trades = signal.diff().abs().fillna(0).sum()
+    print("Number of trades:", int(num_trades))
