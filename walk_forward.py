@@ -52,9 +52,15 @@ def run_walk_forward(px, cost=0.0005):
 if __name__ == "__main__":
     from load_prices import load_prices
     from metrics import annualised_return, annualised_volatility, sharpe_ratio, max_drawdown
+    from plots import plot_walk_forward_comparison
 
     px = load_prices("SPY", "2005-01-01")
+    bh_returns = px.pct_change().dropna()
+
     wf_returns, params_log = run_walk_forward(px)
+
+    original_signal = ma_signal(px, fast=50, slow=200)
+    original_returns = strategy_returns(px, original_signal, cost=0.0005)
 
     print("=== Parameters chosen each period ===")
     print(params_log.to_string(index=False))
@@ -64,3 +70,5 @@ if __name__ == "__main__":
     print(f"Volatility:   {annualised_volatility(wf_returns):.2%}")
     print(f"Sharpe:       {sharpe_ratio(wf_returns):.2f}")
     print(f"Max Drawdown: {max_drawdown(wf_returns):.2%}")
+
+    plot_walk_forward_comparison(wf_returns, original_returns, bh_returns)
